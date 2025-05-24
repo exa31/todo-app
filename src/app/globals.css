@@ -1,26 +1,70 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-primary: #007bff;
+    --color-primary-foreground: #ffffff;
+    --color-primary-dark: #0056b3;
+    --color-primary-light: #66b2ff;
+    --color-secondary: #6c757d;
+    --color-secondary-foreground: #ffffff;
+    --color-secondary-dark: #5a6268;
+    --color-secondary-light: #adb5bd;
+    --color-background: #f8f9fa;
+    --color-background-foreground: #343a40;
+    --color-danger: #dc3545;
+    --color-danger-foreground: #ffffff;
+    --color-danger-dark: #c82333;
+    --color-danger-light: #f5c6cb;
+    --color-success: #28a745;
+    --color-success-foreground: #ffffff;
+    --color-success-dark: #218838;
+    --color-success-light: #c3e6cb;
+    --color-warning: #ffc107;
+    --color-warning-foreground: #212529;
+    --color-warning-dark: #e0a800;
+    --color-warning-light: #ffeeba;
+    --color-info: #17a2b8;
+    --color-info-foreground: #ffffff;
+    --color-info-dark: #138496;
+    --color-info-light: #d1ecf1;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@layer components {
+    .btn-primary {
+        @apply hover:cursor-pointer bg-primary text-primary-foreground hover:bg-primary-dark focus:ring-4 focus:ring-primary-light transition-colors duration-200 transform hover:scale-100;
+    }
+
+    .btn-secondary {
+        @apply hover:cursor-pointer bg-secondary text-secondary-foreground hover:bg-secondary-dark focus:ring-4 focus:ring-secondary-light transition-colors duration-200 transform hover:scale-100;
+    }
+
+    .btn-danger {
+        @apply hover:cursor-pointer bg-danger text-danger-foreground hover:bg-danger-dark focus:ring-4 focus:ring-danger-light transition-colors duration-200 transform hover:scale-100;
+    }
+
+    .btn-success {
+        @apply hover:cursor-pointer bg-success text-success-foreground hover:bg-success-dark focus:ring-4 focus:ring-success-light transition-colors duration-200 transform hover:scale-100;
+    }
+
+    .btn-warning {
+        @apply hover:cursor-pointer bg-warning text-warning-foreground hover:bg-warning-dark focus:ring-4 focus:ring-warning-light transition-colors duration-200 transform hover:scale-100;
+    }
+
+    .btn-info {
+        @apply hover:cursor-pointer bg-info text-info-foreground hover:bg-info-dark focus:ring-4 focus:ring-info-light transition-colors duration-200 transform hover:scale-100;
+    }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes moveUp {
+    0% {
+        transform: translateY(0);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-20000px);
+        rotate: 100deg;
+        opacity: 0;
+    }
 }
