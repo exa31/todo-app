@@ -1,5 +1,6 @@
 import {Document, model, Schema} from 'mongoose';
 import {User} from "@/model/UserModel";
+import {z} from "zod";
 
 export interface Task extends Document {
     title: string;
@@ -10,13 +11,18 @@ export interface Task extends Document {
     updatedAt: Date;
 }
 
-const taskSchema = new Schema<Task>({
+export const TaskModelSchema = z.object({
+    title: z.string().min(5, "Title is required"),
+    description: z.string().optional(),
+})
+
+export const taskSchema = new Schema<Task>({
         title: {type: String, required: true},
         description: {type: String},
         userId: {type: Schema.Types.ObjectId, ref: 'users', required: true},
         status: {
             type: String,
-            enum: ['todo', 'inprogress', 'done'],
+            enum: ['todo', 'done'],
             default: 'todo',
         },
     },

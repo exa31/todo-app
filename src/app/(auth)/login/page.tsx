@@ -44,7 +44,7 @@ export default function LoginPage() {
         const interval = setInterval(() => {
             const newSparkle: Sparkle = {
                 id: Date.now(),
-                left: Math.random() * 100, // posisi horizontal acak
+                left: Math.random() * 99, // posisi horizontal acak
                 startTime: Date.now(),
                 color: `hsl(${Math.random() * 360}, 100%, 50%)`, // warna acak
             };
@@ -89,33 +89,31 @@ export default function LoginPage() {
     };
 
     return (
-        <div className={"pt-20 relative h-screen overflow-hidden"}>
-            <div className="container mx-auto flex items-center justify-center h-full">
-                <div
-                    className={"p-20 gap-10 z-50 bg-white duration-300 transition-all dark:bg-gray-800 rounded-lg shadow-lg flex flex-col items-center justify-center relative"}>
-                    <h1 className="text-4xl font-bold dark:text-white text-black text-center mb-4">
-                        Sign in or Sign up with Google
-                    </h1>
-                    <div id="google-login-button"></div>
-                </div>
-                {sparkles.map((sparkle) => (
-                    <div
-                        key={sparkle.id}
-                        style={{
-                            position: "absolute",
-                            left: `${sparkle.left}%`,
-                            bottom: 0,
-                            width: "10px",
-                            height: "10px",
-                            backgroundColor: sparkle.color,
-                            borderRadius: "50%",
-                            zIndex: 1,
-                            animation: "moveUp 60s linear forwards",
-                            filter: "drop-shadow(0 0 4px rgba(255, 255, 255, 0.5))",
-                        }}
-                    />
-                ))}
+        <div className="container overflow-hidden flex-1 m-auto flex items-center justify-center">
+            <div
+                className={"p-20 gap-10 z-50 bg-white duration-300 shadow-2xl transition-all dark:bg-gray-800 rounded-lg flex flex-col items-center justify-center relative"}>
+                <h1 className="text-4xl font-bold dark:text-white text-black text-center mb-4">
+                    Sign in or Sign up with Google
+                </h1>
+                <div id="google-login-button"></div>
             </div>
+            {sparkles.map((sparkle) => (
+                <div
+                    key={sparkle.id}
+                    style={{
+                        position: "absolute",
+                        left: `${sparkle.left}%`,
+                        bottom: 0,
+                        width: "10px",
+                        height: "10px",
+                        backgroundColor: sparkle.color,
+                        borderRadius: "50%",
+                        zIndex: 1,
+                        animation: "moveUp 60s linear forwards",
+                        filter: "drop-shadow(0 0 4px rgba(255, 255, 255, 0.5))",
+                    }}
+                />
+            ))}
         </div>
     );
 }

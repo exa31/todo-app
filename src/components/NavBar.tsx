@@ -3,14 +3,21 @@
 import useToggleTheme from "@/hook/useToggleTheme";
 import {FaRegMoon} from "react-icons/fa";
 import {GoSun} from "react-icons/go";
-import {getCookie} from "@/lib/cookie";
+import {getCookie, removeCookie} from "@/lib/cookie";
 import Link from "next/link";
 import {useEffect, useState} from "react";
+import {useRouter} from "next/navigation";
 
 const NavBar = () => {
     const {toggleTheme, theme} = useToggleTheme();
-
+    const router = useRouter();
     const [isAuth, setIsAuth] = useState<boolean>(false);
+
+    const handleLogout = () => {
+        removeCookie("token");
+        setIsAuth(false);
+        router.replace("/login");
+    }
 
     useEffect(() => {
         const token = getCookie("token");
@@ -39,7 +46,8 @@ const NavBar = () => {
                     }
                     {
                         isAuth
-                            ? <button className={"btn-danger px-5 py-2 rounded-xl font-semibold"}>Logout</button>
+                            ? <button onClick={handleLogout}
+                                      className={"btn-danger px-5 py-2 rounded-xl font-semibold"}>Logout</button>
                             : <Link className={"btn-primary px-5 py-2 rounded-xl font-semibold"}
                                     href={'/login'}>Login</Link>
                     }

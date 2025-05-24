@@ -12,3 +12,26 @@ export const getCookie = (name: string): string | null => {
 
     return null;
 }
+
+export const setCookie = (name: string, value: string, days: number): void => {
+    if (typeof document === 'undefined') {
+        return; // Tidak bisa mengakses cookie di server-side
+    }
+
+    let expires = '';
+    if (days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = `; expires=${date.toUTCString()}`;
+    }
+
+    document.cookie = `${name}=${value || ''}${expires}; path=/`;
+}
+
+export const removeCookie = (name: string): void => {
+    if (typeof document === 'undefined') {
+        return; // Tidak bisa mengakses cookie di server-side
+    }
+
+    document.cookie = `${name}=; Max-Age=0; path=/`;
+}

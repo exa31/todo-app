@@ -9,7 +9,9 @@ declare global {
                 id: {
                     initialize: (params: {
                         client_id: string;
-                        callback: (response: any) => void;
+                        callback: (response: {
+                            credential: string;
+                        }) => void;
                     }) => void;
                     renderButton: (
                         parent: HTMLElement,

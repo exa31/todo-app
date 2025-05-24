@@ -1,18 +1,15 @@
 import * as mongoose from "mongoose";
-import {Task} from "@/model/TaskModel";
+import TaskModel, {Task} from "@/model/TaskModel";
+import {BaseResponse} from "@/model/ResponseModel";
 
 class TaskService {
 
-    constructor(private readonly db: mongoose.Connection, private readonly taskModel: mongoose.Model<Task>) {
+    constructor(private readonly taskModel: mongoose.Model<Task>) {
     }
 
     async createTask(task: Task): Promise<Task> {
         const newTask = new this.taskModel(task);
         return newTask.save();
-    }
-
-    async getTaskById(id: string): Promise<Task | null> {
-        return this.taskModel.findById(id).populate('userId');
     }
 
     async updateTask(id: string, task: Partial<Task>): Promise<Task | null> {
@@ -23,8 +20,14 @@ class TaskService {
         return this.taskModel.findByIdAndDelete(id);
     }
 
-    async getTasksByUserId(userId: string): Promise<Task[]> {
-        return this.taskModel.find({userId}).populate('userId');
+    async getTasksByUserId(userId: string): Promise<BaseResponse<Task[]>> {
+        const tasks = await this.taskModel.find({userId}).populate('userId');
+        return {
+            status: 200,
+            message: "Tasks fetched successfully",
+            data: tasks,
+            timestamp: new Date().toISOString(),
+        };
     }
 
     async getTasksByStatus(status: string): Promise<Task[]> {
@@ -32,4 +35,6 @@ class TaskService {
     }
 }
 
-export default TaskService;
+const taskService = new TaskService(TaskModel);
+
+export default taskService;
