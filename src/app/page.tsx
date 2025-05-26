@@ -4,6 +4,8 @@ import CardToDo from "@/components/UI/Card/CardToDo";
 import {useEffect, useState} from "react";
 import Modal from "@/components/UI/Modal";
 import useTask from "@/hook/useTask";
+import {TaskFormData} from "@/types/task";
+import {toast} from "react-toastify";
 
 export default function HomePage() {
 
@@ -11,8 +13,47 @@ export default function HomePage() {
         add: false,
         edit: false,
     });
+    const [formData, setFormData] = useState<TaskFormData>({
+        title: "",
+        description: "",
+        status: "todo",
+    })
 
-    const {data, getTasks} = useTask();
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, event: "add" | "edit") => {
+        try {
+
+            e.preventDefault();
+            setErrorMessages(
+                {
+                    title: "",
+                }
+            )
+            // Add your form submission logic here
+            console.log("Form submitted:", formData);
+            if (event === "add") {
+                // Logic for adding a task
+                console.log("Adding task:", formData);
+                await addTask(formData)
+                setOpen((prevState) => {
+                    return {...prevState, add: false};
+                });
+
+            } else if (event === "edit") {
+                // Logic for editing a task
+                console.log("Editing task:", formData);
+                setOpen((prevState) => {
+                    return {...prevState, edit: false};
+                });
+            } else {
+                console.error("Unknown event type:", event);
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            toast.error("Failed to submit the form. Please try again.");
+        }
+    };
+
+    const {data, getTasks, addTask, errorMessages, setErrorMessages} = useTask();
 
     useEffect(() => {
         getTasks();
@@ -26,7 +67,7 @@ export default function HomePage() {
                        return {...prevState, add: false};
                    })}>
                 <div>
-                    <form className="flex flex-col gap-4">
+                    <form onSubmit={(e) => handleSubmit(e, 'add')} className="flex flex-col gap-4">
                         <label htmlFor="title" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Title
                         </label>
@@ -34,15 +75,28 @@ export default function HomePage() {
                             type="text"
                             id="title"
                             name="title"
+                            placeholder="Enter task title"
+                            value={formData.title}
+                            onChange={(e) => setFormData((prevState) => {
+                                return {...prevState, title: e.target.value};
+                            })}
                             className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
-
+                        {
+                            errorMessages.title && (
+                                <p className="text-red-500 text-sm">{errorMessages.title}</p>
+                            )
+                        }
                         <label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Description
                         </label>
                         <textarea
                             id="description"
                             name="description"
+                            value={formData.description}
+                            onChange={(e) => setFormData((prevState) => {
+                                return {...prevState, description: e.target.value};
+                            })}
                             className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Enter task description"
                         />
@@ -65,6 +119,13 @@ export default function HomePage() {
                     <button
                         className="btn-primary px-5 py-2 rounded-lg "
                         onClick={() => setOpen((prevState) => {
+                            setFormData(
+                                {
+                                    title: "",
+                                    description: "",
+                                    status: "todo",
+                                }
+                            )
                             return {...prevState, add: true};
                         })}
                     >

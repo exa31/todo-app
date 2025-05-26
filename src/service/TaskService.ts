@@ -1,15 +1,32 @@
 import * as mongoose from "mongoose";
-import TaskModel, {Task} from "@/model/TaskModel";
+import taskModel, {Task} from "@/model/TaskModel";
 import {BaseResponse} from "@/model/ResponseModel";
+import {TaskFormData} from "@/types/task";
 
 class TaskService {
 
     constructor(private readonly taskModel: mongoose.Model<Task>) {
     }
 
-    async createTask(task: Task): Promise<Task> {
-        const newTask = new this.taskModel(task);
-        return newTask.save();
+    async createTask(task: TaskFormData): Promise<BaseResponse<null>> {
+        try {
+            const newTask: Task = new this.taskModel(task);
+            await newTask.save();
+            return {
+                status: 201,
+                message: "Task created successfully",
+                data: null,
+                timestamp: new Date().toISOString(),
+            };
+        } catch (error) {
+            console.error("Error creating task:", error);
+            return {
+                status: 500,
+                message: "Internal server error",
+                data: null,
+                timestamp: new Date().toISOString(),
+            };
+        }
     }
 
     async updateTask(id: string, task: Partial<Task>): Promise<Task | null> {
@@ -35,6 +52,6 @@ class TaskService {
     }
 }
 
-const taskService = new TaskService(TaskModel);
+const taskService = new TaskService(taskModel);
 
 export default taskService;

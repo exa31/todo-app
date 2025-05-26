@@ -1,10 +1,13 @@
 'use client';
 
 
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {BaseResponse} from "@/model/ResponseModel";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
+import {AuthProvider} from "@/context";
+import {getCookie} from "@/lib/cookie";
+import {ResponseLogin} from "@/types";
 
 
 type Sparkle = {
@@ -18,6 +21,7 @@ export default function LoginPage() {
 
     const [sparkles, setSparkles] = useState<Sparkle[]>([]);
     const router = useRouter()
+    const auth = useContext(AuthProvider)
 
     useEffect(() => {
         if (typeof window !== 'undefined' && window.google) {
@@ -36,7 +40,10 @@ export default function LoginPage() {
             );
         }
 
-        // Generate sparkles on component mount
+        if (getCookie('token')) {
+            // Jika sudah login, redirect ke halaman utama
+            router.replace('/');
+        }
     }, []);
 
     // Buat sparkle baru setiap 100ms
@@ -77,15 +84,19 @@ export default function LoginPage() {
             toast.error(errorData.message);
             return;
         } else {
-            const data: BaseResponse<null> = await res.json();
+            const data: BaseResponse<ResponseLogin> = await res.json();
             console.log('Login successful:', data);
+            auth?.setAuth(
+                {
+                    isAuth: true,
+                    email: data.data?.email,
+                    name: data.data?.name,
+                }
+            )
             toast.success(data.message);
             router.replace('/')
             // Redirect or perform any other action after successful login
-
         }
-
-
     };
 
     return (

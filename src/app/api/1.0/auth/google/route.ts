@@ -3,6 +3,7 @@ import {OAuth2Client} from "google-auth-library";
 import UserService from "@/service/UserService";
 import {BaseResponse} from "@/model/ResponseModel";
 import {connectDB} from "@/database";
+import {ResponseLogin} from "@/types";
 
 const client = new OAuth2Client({clientId: process.env.GOOGLE_CLIENT_ID});
 
@@ -60,10 +61,17 @@ export async function POST(req: NextRequest) {
 
         const response = await UserService.login(email, name);
 
-        return NextResponse.json<BaseResponse<null>>(
-            {...response},
-            {status: response.status, headers: {"Content-Type": "application/json"}}
-        );
+        if (response.data) {
+            return NextResponse.json<BaseResponse<ResponseLogin>>(
+                {...response, data: response.data},
+                {status: response.status, headers: {"Content-Type": "application/json"}}
+            );
+        } else {
+            return NextResponse.json<BaseResponse<null>>(
+                {status: 401, message: "Login failed", data: null, timestamp: new Date().toISOString()},
+                {status: 401, headers: {"Content-Type": "application/json"}}
+            )
+        }
     } catch (error) {
         console.error("Error in Google authentication:", error);
         return NextResponse.json<BaseResponse<null>>(

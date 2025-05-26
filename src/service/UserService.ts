@@ -1,8 +1,9 @@
 import * as mongoose from "mongoose";
-import UserModel, {User} from "@/model/UserModel";
+import userModel, {User} from "@/model/UserModel";
 import {generateJWT} from "@/lib/jwt";
 import {cookies} from "next/headers";
 import {BaseResponse} from "@/model/ResponseModel";
+import {ResponseLogin} from "@/types";
 
 class UserService {
 
@@ -14,7 +15,7 @@ class UserService {
         return newUser.save();
     }
 
-    async login(email: string, name: string): Promise<BaseResponse<null>> {
+    async login(email: string, name: string): Promise<BaseResponse<ResponseLogin | null>> {
         try {
 
             let user: User | null = await this.userModel.findOne({email});
@@ -35,7 +36,10 @@ class UserService {
             return {
                 status: 200,
                 message: "Login successful",
-                data: null,
+                data: {
+                    email: user.email,
+                    name: user.name,
+                },
                 timestamp: new Date().toISOString(),
             }
         } catch (error) {
@@ -50,6 +54,6 @@ class UserService {
     }
 }
 
-const userService = new UserService(UserModel);
+const userService = new UserService(userModel);
 
 export default userService;

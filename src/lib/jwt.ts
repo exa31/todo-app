@@ -9,7 +9,7 @@ const generateJWT = (userId: string): string => {
     };
     return jwt.sign(payload, process.env.JWT_SECRET as string, {
         algorithm: 'HS256',
-        expiresIn: '1h',
+        expiresIn: '1d', // Token will expire in 1 day
     });
 }
 
@@ -21,6 +21,11 @@ const verifyJWT = (token: string): string | payloadJwt => {
         ;
     } catch (error) {
         console.error(error);
+        if (error instanceof jwt.TokenExpiredError) {
+            throw new Error('Token has expired');
+        } else if (error instanceof jwt.JsonWebTokenError) {
+            throw new Error('Invalid token');
+        }
         throw new Error('Invalid token');
     }
 }
