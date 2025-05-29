@@ -42,7 +42,7 @@ export default function RootLayout({
                 <NavBar/>
             }
             <ToastContainer/>
-            <div className={"bg-gray-400 grow h-full flex duration-300 transition-all dark:bg-gray-600"}>
+            <div className={"bg-gray-400 grow h-full duration-300 transition-all dark:bg-gray-600"}>
                 {children}
             </div>
         </AuthProvider.Provider>

@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import {NextRequest} from "next/server";
 import {payloadJwt} from "@/types";
+import logger from "@/lib/logger";
 
 
 const generateJWT = (userId: string): string => {
@@ -20,7 +21,7 @@ const verifyJWT = (token: string): string | payloadJwt => {
         });
         ;
     } catch (error) {
-        console.error(error);
+        logger.error(`JWT verification failed: ${error}`);
         if (error instanceof jwt.TokenExpiredError) {
             throw new Error('Token has expired');
         } else if (error instanceof jwt.JsonWebTokenError) {

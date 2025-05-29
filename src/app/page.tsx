@@ -34,6 +34,9 @@ export default function HomePage() {
                 // Logic for adding a task
                 console.log("Adding task:", formData);
                 await addTask(formData)
+                getTasks()
+                toast.success("Task added successfully!");
+
                 setOpen((prevState) => {
                     return {...prevState, add: false};
                 });
@@ -53,11 +56,39 @@ export default function HomePage() {
         }
     };
 
-    const {data, getTasks, addTask, errorMessages, setErrorMessages} = useTask();
+    const {data, updateTask, updateTaskPriority, getTasks, addTask, errorMessages, setErrorMessages} = useTask();
 
     useEffect(() => {
         getTasks();
     }, []);
+
+    const handleUpdatePriority = async (id: string, status: "todo" | "done", priority: number) => {
+        try {
+            await updateTaskPriority(id, {
+                status: status,
+                priority: priority,
+                _id: id,
+            });
+            toast.success("Task priority updated successfully!");
+        } catch (error) {
+            console.error("Error updating task priority:", error);
+            toast.error("Failed to update task priority. Please try again.");
+        }
+    }
+
+    const handleUpdateTask = async (id: string, status: "todo" | "done") => {
+        try {
+            await updateTask(id, {
+                status: status,
+                _id: id,
+            });
+            toast.success(`Task moved to ${status === "todo" ? "To Do" : "Done"} successfully!`);
+
+        } catch (error) {
+            console.error("Error updating task:", error);
+            toast.error("Failed to update the task. Please try again.");
+        }
+    }
 
     return (
         <>
@@ -114,7 +145,7 @@ export default function HomePage() {
                 as
             </Modal>
             <div
-                className="grid relative overflow-hidden grid-rows-[20px_1fr_20px] items-center justify-items-center h-full p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+                className={"container mx-auto w-full px-3 my-10 space-y-10"}>
                 <div className="flex items-center justify-center w-full">
                     <button
                         className="btn-primary px-5 py-2 rounded-lg "
@@ -132,27 +163,51 @@ export default function HomePage() {
                         Add Task
                     </button>
                 </div>
-                <div id={"todo"}
-                     className={`flex items-center justify-center `}>
-                    <h1>
-                        <span className="text-2xl font-bold text-center text-gray-800">To Do List</span>
-                    </h1>
-                    <CardToDo position={"todo"} title={'test 1'}/>
-                    <CardToDo position={"todo"} title={'test 2'}/>
-                    <CardToDo position={"todo"} title={'test 3'}/>
-                    <CardToDo position={"todo"} title={'test 4'}/>
-                </div>
-                <div id={"done"}
-                     className={`flex items-center justify-center `}>
-                    <h1>
-                        <span className="text-2xl font-bold text-center text-gray-800">Done List</span>
-                    </h1>
-                    <CardToDo position={"done"} title={'test 5'}/>
-                    <CardToDo position={"done"} title={'test 6'}/>
-                    <CardToDo position={"done"} title={'test 7'}/>
-                    <CardToDo position={"done"} title={'test 8'}/>
-                </div>
+                <div className={"flex gap-10 overflow-x-hidden items-start h-full justify-between w-full"}>
+                    <div id="todo"
+                         className="space-y-10 relative min-w-32 grow w-full min-h-[720px] text-center
+                            bg-gradient-to-br from-blue-100 to-blue-200 dark:from-gray-700 dark:to-gray-800
+                            p-5 rounded-2xl shadow-md border border-blue-300
+                            hover:shadow-lg transition-all duration-300">
+                        <h1>
+                            <span className="text-2xl font-bold text-gray-800 dark:text-white">To Do List</span>
+                        </h1>
+                        {
+                            data && data.todo.length === 0 ? (
+                                    <p className="text-gray-500">No tasks available</p>
+                                ) :
+                                data && data.todo.map((task) => (
+                                    <CardToDo key={task._id} position="todo" title={task.title} id={task._id}
+                                              handleUpdateTask={handleUpdateTask}
+                                              handleUpdatePriority={handleUpdatePriority}
+                                              priority={task.priority}
+                                              description={task?.description}/>
+                                ))
+                        }
+                    </div>
 
+                    <div id="done"
+                         className="space-y-10 relative min-w-32 grow w-full min-h-[720px] text-center
+                         bg-gradient-to-br from-green-100 to-green-200 dark:from-gray-600 dark:to-gray-700
+                         p-5 rounded-2xl shadow-md border border-green-300 dark:border-gray-500
+                         hover:shadow-lg transition-all duration-300">
+                        <h1>
+                            <span className="text-2xl font-bold text-gray-800 dark:text-white">Done List</span>
+                        </h1>
+                        {
+                            data && data.done.length === 0 ? (
+                                    <p className="text-gray-500 dark:text-gray-300">No tasks available</p>
+                                ) :
+                                data && data.done.map((task) => (
+                                    <CardToDo key={task._id} position="done" title={task.title} id={task._id}
+                                              handleUpdateTask={handleUpdateTask}
+                                              priority={task.priority}
+                                              handleUpdatePriority={handleUpdatePriority}
+                                              description={task?.description}/>
+                                ))
+                        }
+                    </div>
+                </div>
             </div>
         </>
     );

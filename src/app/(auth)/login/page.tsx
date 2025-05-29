@@ -100,7 +100,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="container overflow-hidden flex-1 m-auto flex items-center justify-center">
+        <div className="container overflow-hidden h-screen m-auto flex  w-full items-center justify-center">
             <div
                 className={"p-20 gap-10 z-50 bg-white duration-300 shadow-2xl transition-all dark:bg-gray-800 rounded-lg flex flex-col items-center justify-center relative"}>
                 <h1 className="text-4xl font-bold dark:text-white text-black text-center mb-4">

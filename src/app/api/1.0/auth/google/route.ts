@@ -4,6 +4,7 @@ import UserService from "@/service/UserService";
 import {BaseResponse} from "@/model/ResponseModel";
 import {connectDB} from "@/database";
 import {ResponseLogin} from "@/types";
+import logger from "@/lib/logger";
 
 const client = new OAuth2Client({clientId: process.env.GOOGLE_CLIENT_ID});
 
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
         ])
         const {credential} = body;
 
-        console.log("Google authentication request body:", body);
+        logger.info(`Google authentication request body: ${JSON.stringify(body)}`);
 
         if (!credential) {
             return NextResponse.json(
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
             )
         }
 
-        console.log("Payload from Google:", payload);
+        logger.info(`Payload from Google: ${JSON.stringify(payload)}`);
 
         if (!payload.email_verified) {
             return NextResponse.json(
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest) {
 
         const {email, name} = payload;
 
-        console.log("Email and name from Google payload:", email, name);
+        logger.info(`Email and name from Google payload: ${email} ${name}`);
 
         // use service login
 
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
             )
         }
     } catch (error) {
-        console.error("Error in Google authentication:", error);
+        logger.error(`Error in Google authentication: ${JSON.stringify(error)}`);
         return NextResponse.json<BaseResponse<null>>(
             {status: 500, message: "Internal server error", data: null, timestamp: new Date().toISOString()},
             {status: 500, headers: {"Content-Type": "application/json"}}

@@ -4,6 +4,7 @@ import {generateJWT} from "@/lib/jwt";
 import {cookies} from "next/headers";
 import {BaseResponse} from "@/model/ResponseModel";
 import {ResponseLogin} from "@/types";
+import logger from "@/lib/logger";
 
 class UserService {
 
@@ -43,7 +44,7 @@ class UserService {
                 timestamp: new Date().toISOString(),
             }
         } catch (error) {
-            console.error("Error during user login:", error);
+            logger.error(`Error during user login: ${JSON.stringify(error)}`);
             return {
                 status: 500,
                 message: "Internal server error",
