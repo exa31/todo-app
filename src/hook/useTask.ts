@@ -47,7 +47,6 @@ const useTask = () => {
                     todo: todoTasks,
                     done: doneTasks,
                 })
-                console.log(todoTasks)
             }
         } catch (error) {
             console.error('Error fetching tasks:', error);
@@ -102,7 +101,7 @@ const useTask = () => {
         }
     }
 
-    const updateTask = async (id: string, task: Partial<TaskModel>) => {
+    const updateTask = async (id: string, task: Partial<TaskModel>, isNotEditStatus: boolean = false) => {
         if (loading) return;
         setLoading(true);
         try {
@@ -122,6 +121,49 @@ const useTask = () => {
                 body: JSON.stringify(task),
             });
 
+            if (task.active === false) {
+                return
+            }
+
+            if (task.status === 'done') {
+                const dataDoneUpdate = data.done.map((item) => {
+                    if (item._id === id) {
+                        return {
+                            ...item,
+                            title: task.title || item.title,
+                            active: task.active || item.active,
+                            description: task.description || item.description,
+
+                        };
+                    }
+                    return item;
+                });
+
+                setData((prevState) => ({
+                    ...prevState,
+                    done: dataDoneUpdate,
+                }));
+            } else if (task.status === 'todo') {
+                const dataTodoUpdate = data.todo.map((item) => {
+                    if (item._id === id) {
+                        return {
+                            ...item,
+                            title: task.title || item.title,
+                            active: task.active || item.active,
+                            description: task.description || item.description,
+                        };
+                    }
+                    return item;
+                });
+
+                setData((prevState) => ({
+                    ...prevState,
+                    todo: dataTodoUpdate,
+                }));
+            }
+
+            if (isNotEditStatus) return
+
             if (task.status === 'done') {
                 const dataUpdate = data.todo.find(t => t._id === id);
                 if (!dataUpdate) {
@@ -129,7 +171,12 @@ const useTask = () => {
                     return;
                 }
                 dataUpdate.priority = data.done.length
-                const newTodo = data.todo.filter(t => t._id !== id);
+                const newTodo = data.todo.filter(t => t._id !== id).map((item, index) => {
+                    return {
+                        ...item,
+                        priority: index,
+                    };
+                })
                 const newDone = [...data.done, dataUpdate];
                 setData({
                     todo: newTodo,
@@ -142,7 +189,12 @@ const useTask = () => {
                     return;
                 }
                 dataUpdate.priority = data.todo.length
-                const newDone = data.done.filter(t => t._id !== id);
+                const newDone = data.done.filter(t => t._id !== id).map(
+                    (item, index) => ({
+                        ...item,
+                        priority: index,
+                    })
+                );
                 const newTodo = [...data.todo, dataUpdate];
                 setData({
                     todo: newTodo,
@@ -261,7 +313,33 @@ const useTask = () => {
         } finally {
             setLoading(false);
         }
+    }
 
+    const deleteTask = async (id: string, status: 'done' | 'todo') => {
+        if (loading) return;
+        setLoading(true);
+        try {
+            const token = getCookie("token");
+            if (!token) {
+                console.error('No token found');
+                router.push('/login');
+                return;
+            }
+            await apiFetch<BaseResponse<null>>(`/api/1.0/task?id=${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            // Remove the task from the local state
+        } catch (error) {
+            console.error('Error removing task:', error);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
     }
 
     return {
@@ -272,6 +350,7 @@ const useTask = () => {
         loading,
         setData,
         errorMessages,
+        deleteTask,
         setErrorMessages,
         updateTask,
     };

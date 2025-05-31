@@ -34,13 +34,10 @@ export default function RootLayout({
             <script src="https://accounts.google.com/gsi/client" async defer></script>
         </head>
         <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col `}
+            className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col ` + (route.startsWith('/login') ? " h-screen " : ' h-full')}
         >
         <AuthProvider.Provider value={{user: auth, setAuth}}>
-            {
-                !route.startsWith('/login') &&
-                <NavBar/>
-            }
+            <NavBar/>
             <ToastContainer/>
             <div className={"bg-gray-400 grow h-full duration-300 transition-all dark:bg-gray-600"}>
                 {children}

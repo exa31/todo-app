@@ -3,7 +3,18 @@
 import {useEffect, useRef} from "react";
 import useDebounce from "@/hook/useDebounce";
 
-const CardToDo = ({title, handleUpdatePriority, priority, position, description, id, handleUpdateTask}: {
+const CardToDo = ({
+                      title,
+                      handleUpdatePriority,
+                      priority,
+                      position,
+                      description,
+                      id,
+                      handleUpdateTask,
+                      handleEditTask,
+                      handleDeleteTask,
+                      handleArchiveTask
+                  }: {
     title: string,
     id: string,
     position: "todo" | "done",
@@ -11,6 +22,9 @@ const CardToDo = ({title, handleUpdatePriority, priority, position, description,
     priority: number,
     handleUpdateTask: (id: string, status: "todo" | "done") => Promise<void>
     handleUpdatePriority: (id: string, status: "todo" | "done", priority: number) => Promise<void>
+    handleEditTask: (id: string, status: "done" | "todo") => void
+    handleDeleteTask: (id: string, status: "done" | "todo") => void
+    handleArchiveTask: (id: string, status: "done" | "todo") => void
 }) => {
     const startPos = useRef({x: 0, y: 0});
     const isDragging = useRef(false);
@@ -201,7 +215,7 @@ const CardToDo = ({title, handleUpdatePriority, priority, position, description,
                 </p>
             )}
             <div className="flex items-center justify-between mt-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400">Priority: {priority + 1}</span>
+                <span className="text-xs text-black dark:text-white">Priority: {priority + 1}</span>
                 <button
                     onClick={() => handleUpdatePriority(id, position, priority ? priority + 1 : 1)}
                     className="btn-secondary px-2 py-1 rounded-lg text-xs"
@@ -214,6 +228,26 @@ const CardToDo = ({title, handleUpdatePriority, priority, position, description,
                     className="btn-primary px-2 py-1 rounded-lg text-xs"
                 >
                     {position === "todo" ? "Mark as Done" : "Reopen Task"}
+                </button>
+            </div>
+            <div className="flex items-center justify-between mt-2">
+                <button
+                    onClick={() => handleEditTask(id, position)}
+                    className="btn-secondary px-2 py-1 rounded-lg text-xs"
+                >
+                    Edit
+                </button>
+                <button
+                    onClick={() => handleArchiveTask(id, position)}
+                    className="btn-secondary px-2 py-1 rounded-lg text-xs"
+                >
+                    Archive
+                </button>
+                <button
+                    onClick={() => handleDeleteTask(id, position)}
+                    className="btn-warning px-2 py-1 rounded-lg text-xs"
+                >
+                    Remove
                 </button>
             </div>
         </div>

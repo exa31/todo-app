@@ -17,7 +17,22 @@ export default function HomePage() {
         title: "",
         description: "",
         status: "todo",
+        _id: "",
     })
+    const {
+        data,
+        updateTask,
+        updateTaskPriority,
+        getTasks,
+        addTask,
+        errorMessages,
+        setErrorMessages,
+        deleteTask
+    } = useTask();
+
+    useEffect(() => {
+        getTasks();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, event: "add" | "edit") => {
         try {
@@ -32,7 +47,6 @@ export default function HomePage() {
             console.log("Form submitted:", formData);
             if (event === "add") {
                 // Logic for adding a task
-                console.log("Adding task:", formData);
                 await addTask(formData)
                 getTasks()
                 toast.success("Task added successfully!");
@@ -43,7 +57,11 @@ export default function HomePage() {
 
             } else if (event === "edit") {
                 // Logic for editing a task
-                console.log("Editing task:", formData);
+                if (!formData._id) {
+                    console.error("Task ID is required for editing.");
+                    return;
+                }
+                await updateTask(formData._id, formData, true)
                 setOpen((prevState) => {
                     return {...prevState, edit: false};
                 });
@@ -56,11 +74,6 @@ export default function HomePage() {
         }
     };
 
-    const {data, updateTask, updateTaskPriority, getTasks, addTask, errorMessages, setErrorMessages} = useTask();
-
-    useEffect(() => {
-        getTasks();
-    }, []);
 
     const handleUpdatePriority = async (id: string, status: "todo" | "done", priority: number) => {
         try {
@@ -87,6 +100,48 @@ export default function HomePage() {
         } catch (error) {
             console.error("Error updating task:", error);
             toast.error("Failed to update the task. Please try again.");
+        }
+    }
+
+    const handleEditTask = (id: string, position: "done" | "todo") => {
+        const task = data[position].find((task) => task._id === id);
+        if (!task) {
+            console.error("Task not found for editing:", id);
+            return;
+        }
+        setFormData(task);
+        setOpen((prevState) => {
+            return {...prevState, edit: true};
+        });
+    }
+
+    const handleDeleteTask = async (id: string, status: 'done' | 'todo') => {
+        try {
+            await deleteTask(id, status);
+            toast.success("Task deleted successfully!");
+            getTasks();
+        } catch (error) {
+            console.error("Error deleting task:", error);
+            toast.error("Failed to delete the task. Please try again.");
+        }
+    }
+
+    const handleArchiveTask = async (id: string, status: 'done' | 'todo') => {
+        try {
+            if (status !== 'done') {
+                toast.error("You must move the task to 'Done' before archiving.");
+                return;
+            }
+            await updateTask(id, {
+                status: status,
+                _id: id,
+                active: false, // Assuming you want to archive the task by setting active to false
+            });
+            toast.success("Task archived successfully!");
+            getTasks();
+        } catch (error) {
+            console.error("Error archiving task:", error);
+            toast.error("Failed to archive the task. Please try again.");
         }
     }
 
@@ -142,7 +197,45 @@ export default function HomePage() {
                    handleClose={() => setOpen((prevState) => {
                        return {...prevState, edit: false};
                    })}>
-                as
+                <div>
+                    <form onSubmit={(e) => handleSubmit(e, 'edit')} className="flex flex-col gap-4">
+                        <label htmlFor="title" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Title
+                        </label>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            placeholder="Enter task title"
+                            value={formData.title}
+                            onChange={(e) => setFormData((prevState) => {
+                                return {...prevState, title: e.target.value};
+                            })}
+                            className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        {
+                            errorMessages.title && (
+                                <p className="text-red-500 text-sm">{errorMessages.title}</p>
+                            )
+                        }
+                        <label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Description
+                        </label>
+                        <textarea
+                            id="description"
+                            name="description"
+                            value={formData.description}
+                            onChange={(e) => setFormData((prevState) => {
+                                return {...prevState, description: e.target.value};
+                            })}
+                            className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Enter task description"
+                        />
+                        <button type="submit"
+                                className="btn-primary px-5 py-2 rounded-lg mt-4">Edit Task
+                        </button>
+                    </form>
+                </div>
             </Modal>
             <div
                 className={"container mx-auto w-full px-3 my-10 space-y-10"}>
@@ -181,6 +274,9 @@ export default function HomePage() {
                                               handleUpdateTask={handleUpdateTask}
                                               handleUpdatePriority={handleUpdatePriority}
                                               priority={task.priority}
+                                              handleEditTask={handleEditTask}
+                                              handleDeleteTask={handleDeleteTask}
+                                              handleArchiveTask={handleArchiveTask}
                                               description={task?.description}/>
                                 ))
                         }
@@ -202,7 +298,10 @@ export default function HomePage() {
                                     <CardToDo key={task._id} position="done" title={task.title} id={task._id}
                                               handleUpdateTask={handleUpdateTask}
                                               priority={task.priority}
+                                              handleEditTask={handleEditTask}
                                               handleUpdatePriority={handleUpdatePriority}
+                                              handleDeleteTask={handleDeleteTask}
+                                              handleArchiveTask={handleArchiveTask}
                                               description={task?.description}/>
                                 ))
                         }

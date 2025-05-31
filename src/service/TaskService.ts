@@ -172,7 +172,7 @@ class TaskService {
 
     async getTasksByUserId(userId: string): Promise<BaseResponse<Task[]>> {
         try {
-            const tasks = await this.taskModel.find({userId});
+            const tasks = await this.taskModel.find({userId, active: true});
             logger.info(`Task with User ID ${userId} fetched successfully: ${tasks.length} tasks found.`);
             return {
                 status: 200,
@@ -193,7 +193,7 @@ class TaskService {
 
     async getTasksByUserIdAndStatus(userId: string, status: string): Promise<Task[]> {
         try {
-            return await this.taskModel.find({userId: userId, status: status})
+            return await this.taskModel.find({userId: userId, status: status, active: true})
         } catch (error) {
             logger.error(`Error fetching tasks by user ID and status: ${error}`);
             return [];

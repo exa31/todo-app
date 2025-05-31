@@ -55,6 +55,88 @@
     .btn-info {
         @apply hover:cursor-pointer bg-info text-info-foreground hover:bg-info-dark focus:ring-4 focus:ring-info-light transition-colors duration-200 transform hover:scale-100;
     }
+
+    .link {
+        @apply relative inline-block px-2 py-1 text-gray-700 dark:text-gray-300 transition-colors duration-200;
+    }
+
+    .link::after {
+        content: '';
+        @apply absolute bottom-0 left-1/2 w-0 h-0.5 bg-transparent transition-all duration-300 ease-in-out;
+        transform: translateX(-50%);
+    }
+
+    .link:hover {
+        @apply text-gray-900 dark:text-gray-100;
+    }
+
+    .link:hover::after {
+        @apply w-full bg-gray-700 dark:bg-white;
+    }
+
+    .link:hover::after {
+        background-color: #374151; /* Tailwind gray-700 */
+    }
+
+    .dark .link:hover::after {
+        background-color: white;
+    }
+
+    .link-active::after {
+        background-color: #374151;
+    }
+
+    .dark .link-active::after {
+        background-color: white;
+    }
+
+    .link-active {
+        @apply relative inline-block px-2 py-1 text-gray-900 dark:text-white font-semibold;
+    }
+
+    .link-active::after {
+        content: '';
+        @apply absolute bottom-0 left-1/2 w-full h-0.5 bg-gray-900 dark:bg-white;
+        transform: translateX(-50%);
+    }
+
+    .side-link {
+        @apply relative inline-block pl-4 pr-2 py-1 text-gray-700 dark:text-gray-300 transition-colors duration-200;
+    }
+
+    .side-link::after {
+        content: '';
+        @apply absolute left-0 top-1/2 h-0 w-0.5 bg-transparent transition-all duration-300 ease-in-out;
+        transform: translateY(-50%);
+    }
+
+    .side-link:hover {
+        @apply text-gray-900 dark:text-gray-100;
+    }
+
+    .side-link:hover::after {
+        @apply h-full;
+        background-color: #374151; /* Tailwind gray-700 */
+    }
+
+    .dark .side-link:hover::after {
+        background-color: white;
+    }
+
+    .side-link-active {
+        @apply relative inline-block pl-4 pr-2 py-1 text-gray-900 dark:text-white font-semibold;
+    }
+
+    .side-link-active::after {
+        content: '';
+        @apply absolute left-0 top-1/2 h-full w-0.5;
+        background-color: #374151;
+        transform: translateY(-50%);
+    }
+
+    .dark .side-link-active::after {
+        background-color: white;
+    }
 }
 
 @keyframes moveUp {
@@ -94,7 +176,7 @@
         opacity: 0;
     }
 }
-    
+
 .modal {
     background-color: #03000093;
     @apply fixed inset-0 py-10 z-10 h-full overflow-auto;

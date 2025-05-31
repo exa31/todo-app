@@ -9,6 +9,7 @@ export type TaskModel = z.infer<typeof TaskModelSchema> & {
     _id: string;
     priority: number;
     status: "todo" | "in-progress" | "done";
+    active: boolean;
     userId: string;
     createdAt: Date;
     updatedAt: Date;
@@ -18,4 +19,5 @@ export type TaskFormData = {
     title: string;
     description?: string;
     status: "todo" | "in-progress" | "done";
+    _id?: string;
 }

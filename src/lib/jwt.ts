@@ -4,10 +4,7 @@ import {payloadJwt} from "@/types";
 import logger from "@/lib/logger";
 
 
-const generateJWT = (userId: string): string => {
-    const payload = {
-        userId,
-    };
+const generateJWT = (payload: object): string => {
     return jwt.sign(payload, process.env.JWT_SECRET as string, {
         algorithm: 'HS256',
         expiresIn: '1d', // Token will expire in 1 day

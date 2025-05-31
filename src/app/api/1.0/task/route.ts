@@ -209,9 +209,21 @@ export async function DELETE(req: NextRequest) {
 
         const userId = payload.userId;
 
-        const body = await req.json()
+        const id = req.nextUrl.searchParams.get("id");
 
-        const response = await taskService.deleteTask(body._id, userId)
+        if (!id) {
+            return NextResponse.json<BaseResponse<null>>(
+                {
+                    status: 400,
+                    message: "Bad Request: Task ID is required",
+                    data: null,
+                    timestamp: new Date().toISOString()
+                },
+                {status: 400, headers: {"Content-Type": "application/json"}}
+            )
+        }
+
+        const response = await taskService.deleteTask(id, userId)
 
         return NextResponse.json<BaseResponse<Task | null>>(
             {...response},
