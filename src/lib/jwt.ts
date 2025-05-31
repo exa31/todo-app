@@ -15,8 +15,8 @@ const verifyJWT = (token: string): string | payloadJwt => {
     try {
         return jwt.verify(token, process.env.JWT_SECRET as string, {
             algorithms: ['HS256'],
-        });
-        ;
+
+        }) as payloadJwt;
     } catch (error) {
         logger.error(`JWT verification failed: ${error}`);
         if (error instanceof jwt.TokenExpiredError) {
