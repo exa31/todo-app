@@ -201,7 +201,9 @@ class TaskService {
 
     async getTaskArchivedByUserId(userId: string): Promise<BaseResponse<Task[]>> {
         try {
-            const tasks = await this.taskModel.find({userId, active: false});
+            const tasks = await this.taskModel.find({userId, active: false}, {}, {
+                sort: {createdAt: -1},
+            });
             logger.info(`Archived tasks for User ID ${userId} fetched successfully: ${tasks.length} tasks found.`);
             return {
                 status: 200,
