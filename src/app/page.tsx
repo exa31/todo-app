@@ -115,9 +115,9 @@ export default function HomePage() {
         });
     }
 
-    const handleDeleteTask = async (id: string, status: 'done' | 'todo') => {
+    const handleDeleteTask = async (id: string) => {
         try {
-            await deleteTask(id, status);
+            await deleteTask(id);
             toast.success("Task deleted successfully!");
             getTasks();
         } catch (error) {

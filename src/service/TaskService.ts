@@ -142,9 +142,8 @@ class TaskService {
 
     async deleteTask(id: string, idUser: string): Promise<BaseResponse<null>> {
         try {
-            const deleted = await this.taskModel.deleteOne({_id: id, userId: idUser});
-            if (deleted.deletedCount === 0) {
-                logger.warn(`Task with ID ${id} not found for user ID ${idUser}.`);
+            const deleted = await this.taskModel.findOneAndDelete({_id: id, userId: idUser});
+            if (!deleted) {
                 return {
                     status: 404,
                     message: "Task not found",
@@ -200,8 +199,25 @@ class TaskService {
         }
     }
 
-    async getTasksByStatus(status: string): Promise<Task[]> {
-        return this.taskModel.find({status}).populate('userId');
+    async getTaskArchivedByUserId(userId: string): Promise<BaseResponse<Task[]>> {
+        try {
+            const tasks = await this.taskModel.find({userId, active: false});
+            logger.info(`Archived tasks for User ID ${userId} fetched successfully: ${tasks.length} tasks found.`);
+            return {
+                status: 200,
+                message: "Archived tasks fetched successfully",
+                data: tasks,
+                timestamp: new Date().toISOString(),
+            };
+        } catch (error) {
+            logger.error("Error fetching archived tasks by user ID:", error);
+            return {
+                status: 500,
+                message: "Internal server error",
+                data: [],
+                timestamp: new Date().toISOString(),
+            };
+        }
     }
 }
 

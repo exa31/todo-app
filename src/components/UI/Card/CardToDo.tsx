@@ -23,7 +23,7 @@ const CardToDo = ({
     handleUpdateTask: (id: string, status: "todo" | "done") => Promise<void>
     handleUpdatePriority: (id: string, status: "todo" | "done", priority: number) => Promise<void>
     handleEditTask: (id: string, status: "done" | "todo") => void
-    handleDeleteTask: (id: string, status: "done" | "todo") => void
+    handleDeleteTask: (id: string) => void
     handleArchiveTask: (id: string, status: "done" | "todo") => void
 }) => {
     const startPos = useRef({x: 0, y: 0});
@@ -244,7 +244,7 @@ const CardToDo = ({
                     Archive
                 </button>
                 <button
-                    onClick={() => handleDeleteTask(id, position)}
+                    onClick={() => handleDeleteTask(id)}
                     className="btn-warning px-2 py-1 rounded-lg text-xs"
                 >
                     Remove

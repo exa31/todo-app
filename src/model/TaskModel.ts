@@ -177,6 +177,10 @@ taskSchema.post('findOneAndDelete', async function (
             if (doc) {
                 logger.info(`Task deleted successfully: ${doc._id}`);
                 // Update task priorities after deletion
+                if (doc.active === false) {
+                    logger.info(`Task with ID ${doc._id} is archived, skipping priority update.`);
+                    return next();
+                }
                 const dataTask = await model<Task>('tasks').find({
                     userId: doc.userId,
                     status: doc.status,
@@ -185,20 +189,49 @@ taskSchema.post('findOneAndDelete', async function (
 
                 const sortedDataTask = dataTask.sort((a, b) => a.priority - b.priority);
                 logger.info(`Sorted tasks for user ${doc.userId} with status ${doc.status}: ${JSON.stringify(sortedDataTask)}`);
-                for (let i = 0; i < sortedDataTask.length; i++) {
-                    const task = sortedDataTask[i];
-                    if (task.priority !== i) {
-                        task.priority = i;
-                        await task.save();
-                        logger.info(`Updated task ${task._id} priority to ${i}`);
-                    }
-                }
+                await model<Task>('tasks').bulkWrite(
+                    sortedDataTask.map((task, index) => ({
+                        updateOne: {
+                            filter: {_id: task._id},
+                            update: {$set: {priority: index}}
+                        }
+                    }))
+                );
             } else {
                 logger.warn("No task found to delete.");
             }
             next()
         } catch (error) {
             logger.error(`Error in post findOneAndDelete hook: ${error}`);
+            next(error as Error);
+        }
+    }
+)
+
+taskSchema.post('deleteOne', async function (
+        this: Query<never, Task>,
+        doc: Task | null,
+        next: CallbackWithoutResultAndOptionalError
+    ) {
+        try {
+            if (doc) {
+                logger.info(`Task deleted successfully: ${doc._id}`);
+                // Update task priorities after deletion
+                const dataTask = await model<Task>('tasks').find({
+                    userId: doc.userId,
+                    status: doc.status,
+                    active: true // Assuming you want to count only active tasks
+                });
+
+                const sortedDataTask = dataTask.sort((a, b) => a.priority - b.priority);
+                logger.info(`Sorted tasks for user ${doc.userId} with status ${doc.status}: ${JSON.stringify(sortedDataTask)}`);
+
+            } else {
+                logger.warn("No task found to delete.");
+            }
+            next()
+        } catch (error) {
+            logger.error(`Error in post deleteOne hook: ${error}`);
             next(error as Error);
         }
     }

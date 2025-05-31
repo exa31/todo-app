@@ -12,6 +12,7 @@ const useTask = () => {
         todo: [],
         done: [],
     });
+    const [dataArchived, setDataArchived] = useState<TaskModel[]>([]);
     const router = useRouter()
     const [loading, setLoading] = useState<boolean>(false);
     const [errorMessages, setErrorMessages] = useState<{ title: string }>({
@@ -315,7 +316,7 @@ const useTask = () => {
         }
     }
 
-    const deleteTask = async (id: string, status: 'done' | 'todo') => {
+    const deleteTask = async (id: string) => {
         if (loading) return;
         setLoading(true);
         try {
@@ -342,12 +343,43 @@ const useTask = () => {
         }
     }
 
+    const getTasksArchived = async () => {
+        if (loading) return;
+        setLoading(true);
+        try {
+            const token = getCookie("token");
+            if (!token) {
+                console.error('No token found');
+                router.push('/login');
+                return;
+            }
+            const response = await apiFetch<BaseResponse<TaskModel[]>>('/api/1.0/task/archived', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            if (response) {
+                setDataArchived(response.data);
+            }
+        } catch (error) {
+            console.error('Error fetching archived tasks:', error);
+
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return {
         data,
         getTasks,
         addTask,
         updateTaskPriority,
         loading,
+        getTasksArchived,
+        dataArchived,
         setData,
         errorMessages,
         deleteTask,
