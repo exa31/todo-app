@@ -256,7 +256,8 @@ export default function HomePage() {
                         Add Task
                     </button>
                 </div>
-                <div className={"flex gap-10 overflow-x-hidden items-start h-full justify-between w-full"}>
+                <div
+                    className={"flex sm:flex-row flex-col gap-10 overflow-x-hidden items-start h-full justify-between w-full"}>
                     <div id="todo"
                          className="space-y-10 relative min-w-32 grow w-full min-h-[720px] text-center
                             bg-gradient-to-br from-blue-100 to-blue-200 dark:from-gray-700 dark:to-gray-800
