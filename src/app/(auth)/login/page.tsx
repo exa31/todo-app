@@ -24,21 +24,20 @@ export default function LoginPage() {
     const auth = useContext(AuthProvider)
 
     useEffect(() => {
-        if (typeof window !== 'undefined' && window.google) {
-            window.google.accounts.id.initialize({
-                client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-                callback: handleCredentialResponse,
-            });
-
-            window.google.accounts.id.renderButton(
-                document.getElementById('google-login-button')!,
-                {
-                    theme: "filled_blue", // <- ini untuk dark mode
-
-                    size: 'large',
-                }
-            );
-        }
+        const interval = setInterval(() => {
+            const target = document.getElementById("google-login-button");
+            if (window.google && target) {
+                clearInterval(interval);
+                window.google.accounts.id.initialize({
+                    client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+                    callback: handleCredentialResponse,
+                });
+                window.google.accounts.id.renderButton(target, {
+                    theme: "filled_blue",
+                    size: "large",
+                });
+            }
+        }, 100); // cek tiap 100ms sampai element muncul
 
         if (getCookie('token')) {
             // Jika sudah login, redirect ke halaman utama

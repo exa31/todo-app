@@ -24,6 +24,7 @@ const NavBar = () => {
     const handleLogout = () => {
         removeCookie("token");
         auth?.setAuth(undefined);
+        setShowSideBar(false);
         router.replace("/login");
     }
 
@@ -103,12 +104,14 @@ const NavBar = () => {
                                        className={"btn-danger sm:block hidden px-5 py-2 rounded-xl font-semibold"}>Logout</button>
                         }
                         {
-                            showSideBar ?
-                                <IoMdClose onClick={() => setShowSideBar(false)}
-                                           className={"text-black sm:hidden block dark:text-white text-2xl hover:cursor-pointer"}/>
-                                :
-                                <CgMenu onClick={() => setShowSideBar(true)}
-                                        className={"text-black sm:hidden block dark:text-white text-2xl hover:cursor-pointer"}/>
+                            auth?.user?.isAuth ?
+                                showSideBar ?
+                                    <IoMdClose onClick={() => setShowSideBar(false)}
+                                               className={"text-black sm:hidden block dark:text-white text-2xl hover:cursor-pointer"}/>
+                                    :
+                                    <CgMenu onClick={() => setShowSideBar(true)}
+                                            className={"text-black sm:hidden block dark:text-white text-2xl hover:cursor-pointer"}/>
+                                : null
                         }
                     </div>
 
@@ -124,6 +127,11 @@ const NavBar = () => {
                 <Link href={'/archive'} className={route === '/archive' ? "side-link-active" : "side-link"}>
                     Archive
                 </Link>
+                {
+                    auth?.user?.isAuth
+                    && <button onClick={handleLogout}
+                               className={"btn-danger px-5 py-2 rounded-xl font-semibold"}>Logout</button>
+                }
             </div>
         </>
     );
